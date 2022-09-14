@@ -1,0 +1,149 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+
+<div class="main-container">
+    <div class="signin" id="signinform">
+        <form>
+            <div class="form-outline mb-4">
+            <input type="email" id="loginemail" class="form-control" />
+            <label class="form-label" for="form2Example1">Email address</label>
+            </div>
+        
+            <div class="form-outline mb-4">
+            <input type="password" id="loginpassword" class="form-control" />
+            <label class="form-label" for="form2Example2">Password</label>
+            </div>
+        
+            <div class="row mb-4">
+            <div class="col d-flex justify-content-center">
+                <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="" id="form2Example31" checked />
+                <label class="form-check-label" for="form2Example31"> Remember me </label>
+                </div>
+            </div>
+        
+            <div class="col">
+                <a href="#!">Forgot password?</a>
+            </div>
+            </div>
+            <button onclick="userLogin()" type="button" class="btn btn-primary btn-block mb-4">Sign in</button>
+            <div class="text-center">
+            <p>Not a member? <a onclick=openRegister() href="#">Register</a></p>
+            </div>
+        </form>
+    </div>
+
+    <div class="signup" id="signupform">
+        <form>
+            <!-- Email input -->
+            <div class="form-outline mb-4">
+                <input type="email" id="firstName" class="form-control" />
+                <label class="form-label" for="form2Example1">First Name</label>
+            </div>
+
+            <div class="form-outline mb-4">
+                <input type="email" id="lastName" class="form-control" />
+                <label class="form-label" for="form2Example1">Last Name</label>
+            </div>
+
+            <div class="form-outline mb-4">
+                <input type="email" id="emailId" class="form-control" />
+                <label class="form-label" for="form2Example1">Email address</label>
+            </div>
+            <div class="form-outline mb-4">
+                <input type="password" id="userPassword" class="form-control" />
+                <label class="form-label" for="form2Example2">Password</label>
+            </div>
+            <button type="button" onclick="registerUser()" class="btn btn-primary btn-block mb-4">Register</button>
+            <!-- Register buttons -->
+            <div class="text-center">
+            <p>Already a member? <a onclick=openLogin() href="#">Login</a></p>
+            </div>
+        </form>
+    </div>
+</div>
+<script>
+window.onload = function(){
+    document.getElementById('signupform').style.display = 'none';
+}
+
+function openRegister(){
+    document.getElementById('signinform').style.display = 'none';
+    document.getElementById('signupform').style.display = 'block';
+}    
+
+function openLogin(){
+    document.getElementById('signinform').style.display = 'block';
+    document.getElementById('signupform').style.display = 'none';
+}
+
+function userLogin(){
+    emailId = document.getElementById('loginemail').value
+    userPassword = document.getElementById('loginpassword').value
+    var myKeyVals = {
+        'emailId': emailId,
+        'userPassword': userPassword,
+    }
+    try{
+        var saveData = $.ajax({
+            type: 'POST',
+            url: "/userlogin",
+            data: myKeyVals,
+            dataType: "text",
+            success: function(resultData, xhr) {
+                var resultDataObject = JSON.parse(resultData)
+                var response = resultDataObject['Message']
+                if (response == 'Failure'){
+                    window.location.href = '/signup';
+                    alert("Invalid credentials. Please try again.")
+                }
+                else{
+                    var token = localStorage.getItem('token')
+                    window.location.href = '/home'+'?token='+token;
+                }
+            }
+    })
+}
+    catch{
+        alert("Please try again later")
+    }
+}
+
+function registerUser(){
+    fName = document.getElementById('firstName').value
+    lName = document.getElementById('lastName').value
+    emailId = document.getElementById('emailId').value
+    userPassword = document.getElementById('userPassword').value
+
+    var myKeyVals = {
+        'fName': fName,
+        'lName': lName,
+        'emailId': emailId,
+        'userPassword': userPassword,
+    }
+    try{
+        var saveData = $.ajax({
+            type: 'POST',
+            url: "/register",
+            data: myKeyVals,
+            dataType: "text",
+            success: function(resultData, xhr) {
+                var resultDataObject = JSON.parse(resultData)
+                if (xhr == 'success'){
+                    window.location.href = '/signup';
+                    alert("You may now login")
+                }
+                else{
+                    alert("Please try again later") 
+                }
+            }
+    })
+}
+    catch{
+        alert("Please try again later")
+    }
+}
+
+</script>
+{% endblock %}

@@ -1,0 +1,141 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block body %}
+
+<div id="header">
+    <h1>Welcome</h1>
+  </div>
+  <div id="navigation">
+    {% if role == 1 %}
+      <ul>
+        <li><button class="btn btn-info btn-lg" data-toggle="modal" onclick="AddBook()">Add a book</button></li>
+        <li><button class="btn btn-info btn-lg" data-toggle="modal" onclick="logout()">Logout</button></li>
+      </ul>
+      {% else %}
+      {% if role == 2 %}
+      <ul>
+        <li><button class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" onclick="logout()">Logout</button></li>
+      </ul>
+    {% endif %}
+    {% endif %}
+  </div>
+  <div class="signup" id="addBookForm">
+        <!-- Email input -->
+        <div class="form-outline mb-4">
+            <input id="bookName" class="form-control" />
+            <label class="form-label" for="form2Example1">Book Name</label>
+        </div>
+
+        <div class="form-outline mb-4">
+            <input id="bookCategory" class="form-control" />
+            <label class="form-label" for="form2Example1">Category</label>
+        </div>
+          <button onclick="addbookfunc()">Add book</button>
+        </div>
+        <div id="content-wrapper">
+          <div id="content">
+
+            
+            {% if role == 1 %}
+              {% for book in allBooks %}
+                <p id=book{{book.id}}><a class="drop-shadow"><img src="images/the_mephisto_club.jpg" width="100" height="150" alt="The Mephisto Club by Tess Gerritsen" class="captionated" />{{book.name}}({{book.category}})</a><button onclick="removeBook(this.id)" id="rmvbtn{{book.id}}">remove book</button></p>
+              {% endfor %}
+            {% else %}
+              {% for book in allBooks %}
+                <p><a href="#" class="drop-shadow"><img src="images/the_mephisto_club.jpg" width="100" height="150" alt="The Mephisto Club by Tess Gerritsen" class="captionated" />{{book.name}}({{book.category}})</a></p>
+              {% endfor %}
+            {% endif %}
+          </div>
+        </div>
+</div>
+  <script>
+    window.onload = function(){
+      document.getElementById('addBookForm').style.display = 'none';
+  }
+  function addbookfunc(){
+      bookName = document.getElementById('bookName').value
+      bookCategory = document.getElementById('bookCategory').value
+      var myKeyVals = {
+          'bookName': bookName,
+          'bookCategory': bookCategory,
+      }
+      try{
+          var saveData = $.ajax({
+              //headers: {"Authorization": localStorage.getItem('token')},
+              type: 'POST',
+              url: "/addbook",
+              data: myKeyVals,
+              dataType: "text",
+              success: function(resultData, xhr) {
+                  if (xhr == 'success'){
+                      window.location.href = '/home';
+                      localStorage.setItem("token", resultDataObject["token"]);
+                  }
+                  else{
+                      alert("Please try again later") 
+                  }
+              }
+      })
+  }
+      catch{
+          alert("Please try again later")
+      }
+  }
+
+  function AddBook(){
+    document.getElementById('addBookForm').style.display = 'block';
+  }
+
+  function logout(){
+    try{
+      var saveData = $.ajax({
+          //headers: {"Authorization": localStorage.getItem('token')},
+          type: 'POST',
+          url: "/logout",
+          data: {},
+          dataType: "text",
+          success: function(resultData, xhr) {
+              if (xhr == 'success'){
+                  window.location.href = '/signup';
+                  localStorage.clear();
+              }
+              else{
+                  alert("Pleaseaa try again later") 
+              }
+          }
+  })
+}
+  catch{
+      alert("Please try again later")
+  }
+
+  }
+
+  function removeBook(id){
+    var bookId = id.substring(6, id.length)
+    var data = {
+      'bookId': bookId
+    }
+    try{
+      var saveData = $.ajax({
+          headers: {"Authorization": localStorage.getItem('token')},
+          type: 'DELETE',
+          url: "/removebook",
+          data: data,
+          dataType: "text",
+          success: function(resultData, xhr) {
+              if (xhr == 'success'){
+                  window.location.href = '/home';
+              }
+              else{
+                  alert("Pleaseaa try again later") 
+              }
+          }
+  })
+}
+  catch{
+      alert("Please try again later")
+  }
+  }
+  </script>
+{% endblock %}
