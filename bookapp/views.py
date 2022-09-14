@@ -78,9 +78,7 @@ class RemoveBook(APIView):
             return Response({"Messsage": "You don't have the authority to delete any books, Please register as admin"}, status=status.HTTP_401_UNAUTHORIZED)
         bookId = request.POST['bookId']
         try:
-            pass
-            # Book.objects.get(id=bookId).delete()
-            # return Response({"message":"Success"}, status=status.HTTP_200_OK)
-            return Response({"Message":"Object does not exist"}, status=status.HTTP_400_BAD_REQUEST)
+            Book.objects.get(id=bookId).delete()
+            return Response({"message":"Success"}, status=status.HTTP_200_OK)
         except:
             return Response({"Message":"Object does not exist"}, status=status.HTTP_400_BAD_REQUEST)
